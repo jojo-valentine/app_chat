@@ -1,38 +1,36 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Group extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      Group.belongsToMany(models.User, {
+        through: models.GroupUser,
+        foreignKey: "group_id",
+        otherKey: "user_id",
+        as: "Users",
+      });
+
+      Group.hasMany(models.Message, {
+        foreignKey: "group_id",
+        as: "Messages",
+      });
     }
   }
-  Group.init({
-    sender: DataTypes.STRING,
-    content: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Group',
-  });
+
+  Group.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "Group",
+      tableName: "Groups",
+    }
+  );
+
   return Group;
 };
-const Group = sequelize.define("Group", {
-  name: DataTypes.STRING
-});
-
-const GroupUser = sequelize.define("GroupUser", {
-  user_id: DataTypes.INTEGER,
-  group_id: DataTypes.INTEGER
-});
-
-const Message = sequelize.define("Message", {
-  content: DataTypes.TEXT,
-  user_id: DataTypes.INTEGER,
-  group_id: DataTypes.INTEGER,
-});

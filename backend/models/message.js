@@ -1,24 +1,42 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      Message.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: "Sender",
+      });
+
+      Message.belongsTo(models.Group, {
+        foreignKey: "group_id",
+        as: "Group",
+      });
     }
   }
-  Message.init({
-    sender: DataTypes.STRING,
-    content: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Message',
-  });
+
+  Message.init(
+    {
+      content: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      group_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true, // null ได้ถ้าเป็นข้อความส่วนตัว
+      },
+    },
+    {
+      sequelize,
+      modelName: "Message",
+      tableName: "Messages",
+    }
+  );
+
   return Message;
 };

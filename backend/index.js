@@ -39,6 +39,9 @@ app.get("/", (req, res) => {
   res.send("🚀 Server is running!");
 });
 
+const routeVersion = "v1";
+const route = require(`./routes/${routeVersion}/api`);
+app.use(`/api/${routeVersion}`, route);
 // เริ่มเซิร์ฟเวอร์
 const PORT = 3000;
 server.listen(PORT, () => {
