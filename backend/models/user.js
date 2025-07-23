@@ -1,34 +1,23 @@
 "use strict";
 const { Model } = require("sequelize");
+const bcrypt = require("bcrypt");
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
       User.hasMany(models.Message, {
         foreignKey: "user_id",
         as: "Messages",
       });
-
-      User.belongsToMany(models.Group, {
-        through: models.GroupUser,
-        foreignKey: "user_id",
-        otherKey: "group_id",
-        as: "Groups",
-      });
     }
+
     async validPassword(password) {
       return await bcrypt.compare(password, this.password);
     }
   }
+
   User.init(
     {
-      sender: DataTypes.STRING,
-      content: DataTypes.STRING,
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -53,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       hooks: {
         beforeCreate: async (user, options) => {
-          const salt = await bcrypt.getSalt(10);
+          const salt = await bcrypt.genSalt(10); // แก้จาก getSalt เป็น genSalt
           user.password = await bcrypt.hash(user.password, salt);
         },
         beforeUpdate: async (user, options) => {
